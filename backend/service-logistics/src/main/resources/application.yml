@@ -1,0 +1,67 @@
+server:
+  port: 8087
+  servlet:
+    context-path: /logistics
+
+spring:
+  application:
+    name: service-logistics
+    
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_logistics?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+    
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 6
+    
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# 物流配置
+logistics:
+  # DHL
+  dhl:
+    api-url: ${DHL_API_URL:https://api.dhl.com}
+    api-key: ${DHL_API_KEY:your_api_key}
+    account: ${DHL_ACCOUNT:your_account}
+  
+  # FedEx
+  fedex:
+    api-url: ${FEDEX_API_URL:https://api.fedex.com}
+    api-key: ${FEDEX_API_KEY:your_api_key}
+    account: ${FEDEX_ACCOUNT:your_account}
+  
+  # UPS
+  ups:
+    api-url: ${UPS_API_URL:https://api.ups.com}
+    api-key: ${UPS_API_KEY:your_api_key}
+    account: ${UPS_ACCOUNT:your_account}
+    
+  # EMS
+  ems:
+    api-url: ${EMS_API_URL:https://api.ems.com}
+    api-key: ${EMS_API_KEY:your_api_key}
+  
+  # 运费配置
+  shipping:
+    free-days: 7  # 免费仓储天数
+    storage-fee-per-kg: 1.0  # 仓储费/kg/天
+    volume-divisor: 5000  # 体积重系数
+
+logging:
+  level:
+    com.pfcbuy: debug

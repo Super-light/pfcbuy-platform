@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pfcbuy.warehouse.mapper.PackageMapper">
+
+    <resultMap id="BaseResultMap" type="com.pfcbuy.warehouse.entity.Package">
+        <id column="id" property="id"/>
+        <result column="package_no" property="packageNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="tracking_number" property="trackingNumber"/>
+        <result column="domestic_logistics" property="domesticLogistics"/>
+        <result column="weight" property="weight"/>
+        <result column="volume_weight" property="volumeWeight"/>
+        <result column="length" property="length"/>
+        <result column="width" property="width"/>
+        <result column="height" property="height"/>
+        <result column="status" property="status"/>
+        <result column="inbound_time" property="inboundTime"/>
+        <result column="qc_time" property="qcTime"/>
+        <result column="qc_status" property="qcStatus"/>
+        <result column="qc_note" property="qcNote"/>
+        <result column="outbound_time" property="outboundTime"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="shelf_location" property="shelfLocation"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+</mapper>

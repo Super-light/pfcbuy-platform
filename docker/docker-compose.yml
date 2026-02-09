@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  # MySQL 8.0 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: pfcbuy-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-sql:/docker-entrypoint-initdb.d:ro
+      - ./mysql-conf:/etc/mysql/conf.d:ro
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=1000
+      - --max_allowed_packet=64M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - pfcbuy-network
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: pfcbuy-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis-conf/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - pfcbuy-network
+
+  # Elasticsearch (可选，用于搜索服务)
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: pfcbuy-elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - pfcbuy-network
+    profiles:
+      - full  # 使用 --profile full 才会启动
+
+  # Kibana (可选，ES的可视化界面)
+  kibana:
+    image: kibana:8.11.0
+    container_name: pfcbuy-kibana
+    restart: always
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - pfcbuy-network
+    profiles:
+      - full
+
+  # Redis Commander (可选，Redis可视化管理工具)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: pfcbuy-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - pfcbuy-network
+    profiles:
+      - dev  # 使用 --profile dev 才会启动
+
+  # phpMyAdmin (可选，MySQL可视化管理工具)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: pfcbuy-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8082:80"
+    depends_on:
+      - mysql
+    networks:
+      - pfcbuy-network
+    profiles:
+      - dev
+
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  es-data:
+    driver: local
+
+networks:
+  pfcbuy-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

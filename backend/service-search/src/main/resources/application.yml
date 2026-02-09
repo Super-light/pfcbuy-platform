@@ -1,0 +1,60 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /search
+
+spring:
+  application:
+    name: service-search
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_search?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 7
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: is_deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:mapper/**/*.xml
+
+# 搜索配置
+search:
+  # 热门搜索词数量
+  hot-keywords-limit: 20
+  # 搜索历史保存天数
+  history-expire-days: 30
+  # 搜索历史最大数量
+  history-max-size: 50
+  # 图片搜索相似度阈值
+  image-similarity-threshold: 0.75
+  # Elasticsearch 是否启用（默认禁用）
+  elasticsearch-enabled: false
+
+logging:
+  level:
+    com.pfcbuy: debug

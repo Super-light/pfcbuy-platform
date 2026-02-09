@@ -1,0 +1,86 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /payment
+
+spring:
+  application:
+    name: service-payment
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_payment?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 4
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+        max-wait: -1ms
+
+# MyBatis Plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.pfcbuy.payment.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Stripe 配置
+stripe:
+  api-key: ${STRIPE_API_KEY:sk_test_your_test_key}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_your_webhook_secret}
+  supported-currencies: USD,EUR,GBP,JPY,CNY
+  success-url: ${PAYMENT_SUCCESS_URL:http://localhost:3000/payment/success}
+  cancel-url: ${PAYMENT_CANCEL_URL:http://localhost:3000/payment/cancel}
+
+# 飞来汇配置
+inflyway:
+  api-base-url: ${INFLYWAY_API_URL:https://api.inflyway.com}
+  merchant-no: ${INFLYWAY_MERCHANT_NO:your_merchant_no}
+  api-key: ${INFLYWAY_API_KEY:your_api_key}
+  api-secret: ${INFLYWAY_API_SECRET:your_api_secret}
+  notify-url: ${INFLYWAY_NOTIFY_URL:http://yourdomain.com/payment/webhook/inflyway}
+  return-url: ${INFLYWAY_RETURN_URL:http://localhost:3000/payment/success}
+  supported-currencies: USD,EUR,GBP,JPY,CNY,HKD
+  timeout: 30
+
+# Feign 配置
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: full
+
+# 服务地址配置
+service:
+  order:
+    url: ${ORDER_SERVICE_URL:http://localhost:8081}
+
+# 日志配置
+logging:
+  level:
+    com.pfcbuy: debug
+    com.stripe: info

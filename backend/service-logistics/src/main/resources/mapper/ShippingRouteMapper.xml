@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pfcbuy.logistics.mapper.ShippingRouteMapper">
+
+    <resultMap id="BaseResultMap" type="com.pfcbuy.logistics.entity.ShippingRoute">
+        <id column="id" property="id"/>
+        <result column="route_code" property="routeCode"/>
+        <result column="route_name" property="routeName"/>
+        <result column="logistics_provider" property="logisticsProvider"/>
+        <result column="source_country" property="sourceCountry"/>
+        <result column="dest_country" property="destCountry"/>
+        <result column="shipping_type" property="shippingType"/>
+        <result column="min_weight" property="minWeight"/>
+        <result column="max_weight" property="maxWeight"/>
+        <result column="first_weight" property="firstWeight"/>
+        <result column="first_weight_price" property="firstWeightPrice"/>
+        <result column="additional_weight_price" property="additionalWeightPrice"/>
+        <result column="estimated_days" property="estimatedDays"/>
+        <result column="currency" property="currency"/>
+        <result column="is_active" property="isActive"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pfcbuy.payment.mapper.PaymentMapper">
+
+    <resultMap id="BaseResultMap" type="com.pfcbuy.payment.entity.Payment">
+        <id column="id" property="id"/>
+        <result column="payment_no" property="paymentNo"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="payment_channel" property="paymentChannel"/>
+        <result column="payment_method" property="paymentMethod"/>
+        <result column="amount" property="amount"/>
+        <result column="currency" property="currency"/>
+        <result column="exchange_rate" property="exchangeRate"/>
+        <result column="original_amount" property="originalAmount"/>
+        <result column="original_currency" property="originalCurrency"/>
+        <result column="status" property="status"/>
+        <result column="third_party_payment_id" property="thirdPartyPaymentId"/>
+        <result column="third_party_trade_no" property="thirdPartyTradeNo"/>
+        <result column="charge_id" property="chargeId"/>
+        <result column="client_secret" property="clientSecret"/>
+        <result column="payment_url" property="paymentUrl"/>
+        <result column="paid_time" property="paidTime"/>
+        <result column="failure_reason" property="failureReason"/>
+        <result column="remark" property="remark"/>
+        <result column="metadata" property="metadata"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <!-- 根据支付单号查询 -->
+    <select id="findByPaymentNo" resultMap="BaseResultMap">
+        SELECT * FROM t_payment
+        WHERE payment_no = #{paymentNo}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据订单号查询 -->
+    <select id="findByOrderNo" resultMap="BaseResultMap">
+        SELECT * FROM t_payment
+        WHERE order_no = #{orderNo}
+          AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据第三方支付ID查询 -->
+    <select id="findByThirdPartyPaymentId" resultMap="BaseResultMap">
+        SELECT * FROM t_payment
+        WHERE third_party_payment_id = #{thirdPartyPaymentId}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据chargeId查询 -->
+    <select id="findByChargeId" resultMap="BaseResultMap">
+        SELECT * FROM t_payment
+        WHERE charge_id = #{chargeId}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

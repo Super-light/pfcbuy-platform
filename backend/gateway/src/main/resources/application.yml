@@ -1,0 +1,131 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_gateway?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+
+  cloud:
+    gateway:
+      # 路由配置
+      routes:
+        # 用户服务
+        - id: service-user
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/user/**,/api/auth/**
+          filters:
+            - StripPrefix=1
+
+        # 商品服务
+        - id: service-product
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=1
+
+        # 订单服务
+        - id: service-order
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=1
+
+        # 支付服务
+        - id: service-payment
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/payment/**,/api/webhook/**
+          filters:
+            - StripPrefix=1
+
+        # 搜索服务
+        - id: service-search
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - StripPrefix=1
+
+        # 仓储服务
+        - id: service-warehouse
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/warehouse/**
+          filters:
+            - StripPrefix=1
+
+        # 物流服务
+        - id: service-logistics
+          uri: http://localhost:8087
+          predicates:
+            - Path=/api/logistics/**
+          filters:
+            - StripPrefix=1
+
+      # 全局CORS配置
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+
+      # 默认过滤器
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+  # Redis配置（用于限流）
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 0
+    timeout: 5000ms
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.pfcbuy.gateway.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:pfcbuy_secret_key_2024_very_long_and_secure}
+  expiration: 86400000  # 24小时
+
+# 不需要认证的路径
+auth:
+  skip-urls:
+    - /api/auth/login
+    - /api/auth/register
+    - /api/auth/health
+    - /api/product/resolve
+    - /api/product/platforms
+    - /api/search/keyword
+    - /api/search/hot-keywords
+    - /api/webhook/**
+    - /actuator/**
+
+logging:
+  level:
+    org.springframework.cloud.gateway: debug
+    com.pfcbuy: debug

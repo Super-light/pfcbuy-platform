@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pfcbuy.product.mapper.ProductSnapshotMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.pfcbuy.product.entity.ProductSnapshot">
+        <id column="id" property="id" />
+        <result column="platform" property="platform" />
+        <result column="platform_product_id" property="platformProductId" />
+        <result column="platform_sku_id" property="platformSkuId" />
+        <result column="title" property="title" />
+        <result column="subtitle" property="subtitle" />
+        <result column="sku_attributes" property="skuAttributes" 
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        <result column="price" property="price" />
+        <result column="original_price" property="originalPrice" />
+        <result column="currency" property="currency" />
+        <result column="stock" property="stock" />
+        <result column="main_image" property="mainImage" />
+        <result column="images" property="images" 
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        <result column="product_url" property="productUrl" />
+        <result column="snapshot_time" property="snapshotTime" />
+        <result column="available" property="available" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_deleted" property="isDeleted" />
+    </resultMap>
+
+    <!-- 查询最新快照 -->
+    <select id="findLatestByPlatformAndProductId" resultMap="BaseResultMap">
+        SELECT *
+        FROM product_snapshot
+        WHERE platform = #{platform}
+          AND platform_product_id = #{platformProductId}
+          AND is_deleted = 0
+        ORDER BY snapshot_time DESC, create_time DESC
+        LIMIT 1
+    </select>
+
+</mapper>

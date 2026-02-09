@@ -1,0 +1,50 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: service-order
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_order?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 2
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.pfcbuy.order.entity
+
+# Feign配置
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+
+# 服务地址配置
+service:
+  product:
+    url: ${PRODUCT_SERVICE_URL:http://localhost:8083}
+  payment:
+    url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
+
+# 业务配置
+business:
+  order:
+    # 订单超时时间（分钟）
+    timeout-minutes: 30
+    # 订单号前缀
+    order-prefix: PFC
+
+logging:
+  level:
+    com.pfcbuy: debug

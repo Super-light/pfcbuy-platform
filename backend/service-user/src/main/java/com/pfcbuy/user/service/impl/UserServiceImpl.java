@@ -1,0 +1,230 @@
+package com.pfcbuy.user.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.pfcbuy.common.exception.BusinessException;
+import com.pfcbuy.common.exception.ValidationException;
+import com.pfcbuy.common.utils.JwtUtil;
+import com.pfcbuy.user.dto.LoginRequest;
+import com.pfcbuy.user.dto.LoginResponse;
+import com.pfcbuy.user.dto.RegisterRequest;
+import com.pfcbuy.user.entity.User;
+import com.pfcbuy.user.mapper.UserMapper;
+import com.pfcbuy.user.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+/**
+ * 用户服务实现类
+ *
+ * @author PfcBuy Team
+ * @since 2024-02-04
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+    
+    @Value("${jwt.expiration}")
+    private Long jwtExpiration;
+    
+    @Value("${jwt.refresh-expiration}")
+    private Long refreshExpiration;
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public User register(RegisterRequest request) {
+        log.info("用户注册: username={}, email={}", request.getUsername(), request.getEmail());
+        
+        // 1. 验证密码一致性
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new ValidationException("两次输入的密码不一致");
+        }
+        
+        // 2. 检查用户名是否已存在
+        if (existsByUsername(request.getUsername())) {
+            throw new ValidationException("用户名已存在");
+        }
+        
+        // 3. 检查邮箱是否已存在
+        if (existsByEmail(request.getEmail())) {
+            throw new ValidationException("邮箱已被注册");
+        }
+        
+        // 4. 创建用户对象
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
+        user.setStatus("ACTIVE");  // 正常状态
+        user.setLanguage(request.getLanguage() != null ? request.getLanguage() : "en");
+        user.setCountry(request.getCountryCode() != null ? request.getCountryCode() : "CN");
+        user.setMemberLevel("NORMAL");
+        user.setBalance(java.math.BigDecimal.ZERO);
+        user.setPoints(0);
+        user.setCurrency("USD");
+        
+        // 5. 保存到数据库
+        userMapper.insert(user);
+        
+        log.info("用户注册成功: userId={}, username={}", user.getId(), user.getUsername());
+        return user;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LoginResponse login(LoginRequest request) {
+        log.info("用户登录尝试: username={}", request.getUsername());
+        
+        // 1. 根据用户名或邮箱查询用户
+        User user = getUserByUsernameOrEmail(request.getUsername());
+        if (user == null) {
+            throw new BusinessException(401, "用户名或密码错误");
+        }
+        
+        // 2. 验证密码
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BusinessException(401, "用户名或密码错误");
+        }
+        
+        // 3. 检查用户状态
+        if ("DISABLED".equals(user.getStatus())) {
+            throw new BusinessException(403, "账户已被禁用");
+        }
+        if ("FROZEN".equals(user.getStatus())) {
+            throw new BusinessException(403, "账户已被冻结");
+        }
+        
+        // 4. 生成JWT Token
+        Long expiration = request.getRememberMe() ? refreshExpiration : jwtExpiration;
+        String accessToken = JwtUtil.generateToken(user.getId(), user.getUsername(), jwtSecret, expiration);
+        String refreshToken = JwtUtil.generateToken(user.getId(), user.getUsername(), jwtSecret, refreshExpiration);
+        
+        // 5. 更新最后登录信息
+        updateLastLogin(user.getId(), "127.0.0.1");  // TODO: 从请求中获取真实IP
+        
+        // 6. 构建响应
+        LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                
+                .language(user.getLanguage())
+                .currency(user.getCurrency())
+                .lastLoginTime(user.getLastLoginTime())
+                .build();
+        
+        LoginResponse response = LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(expiration / 1000)
+                .userInfo(userInfo)
+                .build();
+        
+        log.info("用户登录成功: userId={}, username={}", user.getId(), user.getUsername());
+        return response;
+    }
+    
+    @Override
+    public LoginResponse refreshToken(String refreshToken) {
+        log.info("刷新Token");
+        
+        try {
+            // 1. 验证并解析Token
+            if (!JwtUtil.validateToken(refreshToken, jwtSecret)) {
+                throw new BusinessException(401, "Invalid refresh token");
+            }
+            
+            Long userId = JwtUtil.getUserIdFromToken(refreshToken, jwtSecret);
+            String username = JwtUtil.getUsernameFromToken(refreshToken, jwtSecret);
+            
+            // 2. 查询用户信息
+            User user = getUserById(userId);
+            if (user == null) {
+                throw new BusinessException(401, "用户不存在");
+            }
+            
+            // 3. 生成新的Token
+            String newAccessToken = JwtUtil.generateToken(userId, username, jwtSecret, jwtExpiration);
+            String newRefreshToken = JwtUtil.generateToken(userId, username, jwtSecret, refreshExpiration);
+            
+            // 4. 构建响应
+            LoginResponse.UserInfo userInfo = LoginResponse.UserInfo.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .avatar(user.getAvatar())
+                    
+                    .language(user.getLanguage())
+                    .currency(user.getCurrency())
+                    .lastLoginTime(user.getLastLoginTime())
+                    .build();
+            
+            return LoginResponse.builder()
+                    .accessToken(newAccessToken)
+                    .refreshToken(newRefreshToken)
+                    .tokenType("Bearer")
+                    .expiresIn(jwtExpiration / 1000)
+                    .userInfo(userInfo)
+                    .build();
+            
+        } catch (Exception e) {
+            log.error("刷新Token失败", e);
+            throw new BusinessException(401, "刷新Token失败");
+        }
+    }
+    
+    @Override
+    public User getUserById(Long userId) {
+        return userMapper.selectById(userId);
+    }
+    
+    @Override
+    public User getUserByUsernameOrEmail(String usernameOrEmail) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(w -> w.eq(User::getUsername, usernameOrEmail)
+                          .or()
+                          .eq(User::getEmail, usernameOrEmail));
+        return userMapper.selectOne(wrapper);
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateLastLogin(Long userId, String ip) {
+        User user = new User();
+        user.setId(userId);
+        user.setLastLoginTime(LocalDateTime.now());
+        user.setLastLoginIp(ip);
+        userMapper.updateById(user);
+    }
+    
+    @Override
+    public boolean existsByUsername(String username) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, username);
+        return userMapper.selectCount(wrapper) > 0;
+    }
+    
+    @Override
+    public boolean existsByEmail(String email) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, email);
+        return userMapper.selectCount(wrapper) > 0;
+    }
+}

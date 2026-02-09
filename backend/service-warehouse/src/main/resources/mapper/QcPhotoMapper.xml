@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pfcbuy.warehouse.mapper.QcPhotoMapper">
+
+    <resultMap id="BaseResultMap" type="com.pfcbuy.warehouse.entity.QcPhoto">
+        <id column="id" property="id"/>
+        <result column="package_id" property="packageId"/>
+        <result column="photo_url" property="photoUrl"/>
+        <result column="photo_type" property="photoType"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="width" property="width"/>
+        <result column="height" property="height"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="upload_user_id" property="uploadUserId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+</mapper>

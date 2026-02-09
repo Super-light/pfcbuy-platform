@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pfcbuy.logistics.mapper.ShippingOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.pfcbuy.logistics.entity.ShippingOrder">
+        <id column="id" property="id"/>
+        <result column="shipping_no" property="shippingNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="package_ids" property="packageIds"/>
+        <result column="route_id" property="routeId"/>
+        <result column="route_name" property="routeName"/>
+        <result column="logistics_provider" property="logisticsProvider"/>
+        <result column="tracking_number" property="trackingNumber"/>
+        <result column="recipient_name" property="recipientName"/>
+        <result column="recipient_phone" property="recipientPhone"/>
+        <result column="recipient_email" property="recipientEmail"/>
+        <result column="recipient_country" property="recipientCountry"/>
+        <result column="recipient_province" property="recipientProvince"/>
+        <result column="recipient_city" property="recipientCity"/>
+        <result column="recipient_district" property="recipientDistrict"/>
+        <result column="recipient_address" property="recipientAddress"/>
+        <result column="recipient_postal_code" property="recipientPostalCode"/>
+        <result column="total_weight" property="totalWeight"/>
+        <result column="volume_weight" property="volumeWeight"/>
+        <result column="chargeable_weight" property="chargeableWeight"/>
+        <result column="shipping_fee" property="shippingFee"/>
+        <result column="insurance_fee" property="insuranceFee"/>
+        <result column="customs_fee" property="customsFee"/>
+        <result column="other_fee" property="otherFee"/>
+        <result column="total_fee" property="totalFee"/>
+        <result column="currency" property="currency"/>
+        <result column="status" property="status"/>
+        <result column="paid_time" property="paidTime"/>
+        <result column="shipped_time" property="shippedTime"/>
+        <result column="delivered_time" property="deliveredTime"/>
+        <result column="estimated_delivery_date" property="estimatedDeliveryDate"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+</mapper>

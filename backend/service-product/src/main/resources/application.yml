@@ -1,0 +1,59 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /product
+
+spring:
+  application:
+    name: product-service
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+    
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 3
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+# 日志配置
+logging:
+  level:
+    com.pfcbuy: debug
+    com.baomidou.mybatisplus: debug
+
+# 电商平台API配置
+platform:
+  taobao:
+    api-url: https://api.taobao.com
+    app-key: ${TAOBAO_APP_KEY:your_app_key}
+    app-secret: ${TAOBAO_APP_SECRET:your_app_secret}
+  jd:
+    api-url: https://api.jd.com
+    app-key: ${JD_APP_KEY:your_app_key}
+    app-secret: ${JD_APP_SECRET:your_app_secret}
+  tmall:
+    api-url: https://api.tmall.com
+    app-key: ${TMALL_APP_KEY:your_app_key}
+    app-secret: ${TMALL_APP_SECRET:your_app_secret}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pfcbuy.search.mapper.HotKeywordMapper">
+
+    <resultMap id="BaseResultMap" type="com.pfcbuy.search.entity.HotKeyword">
+        <id column="id" property="id"/>
+        <result column="keyword" property="keyword"/>
+        <result column="search_count" property="searchCount"/>
+        <result column="trend" property="trend"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="visible" property="visible"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+</mapper>

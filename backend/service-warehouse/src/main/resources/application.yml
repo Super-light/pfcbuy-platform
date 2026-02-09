@@ -1,0 +1,67 @@
+server:
+  port: 8086
+  servlet:
+    context-path: /warehouse
+
+spring:
+  application:
+    name: service-warehouse
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pfcbuy_warehouse?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+  
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 5
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath:/mapper/*.xml
+
+# OSS配置（阿里云）
+oss:
+  endpoint: ${OSS_ENDPOINT:oss-cn-hangzhou.aliyuncs.com}
+  access-key-id: ${OSS_ACCESS_KEY:}
+  access-key-secret: ${OSS_SECRET_KEY:}
+  bucket-name: ${OSS_BUCKET:pfcbuy-warehouse}
+  base-url: ${OSS_BASE_URL:https://pfcbuy-warehouse.oss-cn-hangzhou.aliyuncs.com}
+
+# 仓储配置
+warehouse:
+  # 默认仓库地址
+  default-address: 广东省深圳市宝安区XX仓库
+  # 包裹存储天数
+  storage-days: 90
+  # 免费存储天数
+  free-storage-days: 7
+  # 超期存储费（元/天）
+  overdue-fee-per-day: 1.0
+  # 质检照片数量限制
+  qc-photo-limit: 10
+
+logging:
+  level:
+    com.pfcbuy: debug
+    com.aliyun.oss: info
