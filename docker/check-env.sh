@@ -9,7 +9,7 @@ echo ""
 echo "🔍 检查 Docker..."
 if command -v docker &> /dev/null; then
     docker_version=$(docker --version)
-    echo "✅ Docker已安装: $docker_version"
+    echo "Docker已安装: $docker_version"
 else
     echo "❌ Docker未安装"
     echo "   安装指南: https://docs.docker.com/get-docker/"
@@ -21,10 +21,10 @@ echo ""
 echo "🔍 检查 Docker Compose..."
 if command -v docker-compose &> /dev/null; then
     compose_version=$(docker-compose --version)
-    echo "✅ Docker Compose已安装: $compose_version"
+    echo "Docker Compose已安装: $compose_version"
 elif docker compose version &> /dev/null; then
     compose_version=$(docker compose version)
-    echo "✅ Docker Compose已安装: $compose_version"
+    echo "Docker Compose已安装: $compose_version"
 else
     echo "❌ Docker Compose未安装"
     exit 1
@@ -34,7 +34,7 @@ fi
 echo ""
 echo "🔍 检查 Docker服务状态..."
 if docker info &> /dev/null; then
-    echo "✅ Docker服务运行中"
+    echo "Docker服务运行中"
 else
     echo "❌ Docker服务未运行，请启动Docker Desktop"
     exit 1
@@ -50,7 +50,7 @@ check_port() {
         lsof -Pi :$1 -sTCP:LISTEN | tail -n +2
         return 1
     else
-        echo "✅ 端口 $1 可用"
+        echo "端口 $1 可用"
         return 0
     fi
 }
@@ -65,18 +65,20 @@ check_port 8082 || all_ports_ok=false
 # 检查配置文件
 echo ""
 echo "🔍 检查配置文件..."
+# shellcheck disable=SC2164
 cd "$(dirname "$0")"
 
 if [ -f "docker-compose.yml" ]; then
-    echo "✅ docker-compose.yml 存在"
+    echo "docker-compose.yml 存在"
 else
     echo "❌ docker-compose.yml 缺失"
     exit 1
 fi
 
+# shellcheck disable=SC2012
 sql_count=$(ls init-sql/*.sql 2>/dev/null | wc -l | xargs)
 if [ "$sql_count" -gt 0 ]; then
-    echo "✅ SQL初始化脚本: $sql_count 个"
+    echo "SQL初始化脚本: $sql_count 个"
 else
     echo "❌ SQL初始化脚本缺失"
 fi
@@ -85,7 +87,7 @@ fi
 echo ""
 echo "========================================="
 if [ "$all_ports_ok" = true ]; then
-    echo "✅ 环境检查通过，可以启动Docker环境"
+    echo "环境检查通过，可以启动Docker环境"
     echo ""
     echo "💡 启动命令："
     echo "   ./start.sh"

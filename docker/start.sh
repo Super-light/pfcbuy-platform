@@ -5,6 +5,7 @@ echo "   PfcBuy Platform - Docker环境启动"
 echo "========================================="
 echo ""
 
+# shellcheck disable=SC2164
 cd "$(dirname "$0")"
 
 # 检查Docker是否安装
@@ -18,11 +19,11 @@ if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/
     exit 1
 fi
 
-echo "📦 启动基础服务（MySQL + Redis）..."
+echo "启动基础服务（MySQL + Redis）..."
 docker compose up -d mysql redis
 
 echo ""
-echo "⏳ 等待服务启动（预计30秒）..."
+echo "等待服务启动（预计30秒）..."
 sleep 10
 
 echo ""

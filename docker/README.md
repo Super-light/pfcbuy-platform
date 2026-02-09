@@ -1,6 +1,6 @@
 # PfcBuy Platform - Docker环境使用指南
 
-## 📋 环境说明
+## 环境说明
 
 本Docker环境提供PfcBuy平台所需的所有基础服务，包括：
 
@@ -16,7 +16,7 @@
 
 ---
 
-## 🚀 快速开始
+## 快速开始
 
 ### 1. 启动基础环境（MySQL + Redis）
 
@@ -48,7 +48,7 @@ docker compose --profile full --profile dev up -d
 
 ---
 
-## 🛑 停止服务
+## 停止服务
 
 ### 停止所有服务
 ```bash
@@ -65,11 +65,11 @@ docker compose down
 docker compose down -v
 ```
 
-**⚠️ 警告**: 此操作会删除所有数据！
+**警告**: 此操作会删除所有数据！
 
 ---
 
-## 📊 查看日志
+## 查看日志
 
 ### 查看所有服务日志
 ```bash
@@ -89,7 +89,7 @@ docker compose logs -f mysql
 
 ---
 
-## 🔍 检查服务状态
+## 检查服务状态
 
 ```bash
 docker compose ps
@@ -97,7 +97,7 @@ docker compose ps
 
 ---
 
-## 🗄️ 数据库连接信息
+## 数据库连接信息
 
 ### MySQL
 - **Host**: localhost
@@ -121,7 +121,7 @@ docker compose ps
 
 ---
 
-## 📁 目录结构
+## 目录结构
 
 ```
 docker/
@@ -147,7 +147,7 @@ docker/
 
 ---
 
-## 🔧 常见问题
+## 常见问题
 
 ### 1. 端口被占用
 如果3306或6379端口被占用，修改 `docker-compose.yml` 中的端口映射：
@@ -186,7 +186,7 @@ docker compose logs -f mysql
 
 ---
 
-## 🧹 清理环境
+## 清理环境
 
 ### 清理停止的容器
 ```bash
@@ -206,7 +206,7 @@ docker system prune -a --volumes
 
 ---
 
-## 💡 开发建议
+## 开发建议
 
 1. **开发阶段**: 使用 `--profile dev` 启动管理工具，方便调试
 2. **测试阶段**: 使用基础环境即可，减少资源占用
@@ -214,5 +214,5 @@ docker system prune -a --volumes
 
 ---
 
-**维护者:** PfcBuy Platform Team  
+**维护者:** plus  
 **更新日期:** 2024-02-06
