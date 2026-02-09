@@ -228,7 +228,7 @@ public class InflywayPaymentService implements PaymentChannelService {
         refundParams.put("sign", sign);
 
         String apiUrl = inflywayConfig.getApiBaseUrl() + "/api/v1/payment/refund";
-        // 使用 postWithAuth 方法替代不存在的 post 方法
+
         InflywayPaymentResponse refundResponse = httpClient.postWithAuth(apiUrl, refundParams, inflywayConfig.getMerchantNo(), inflywayConfig.getApiSecret(), "PfcBuy/1.0", InflywayPaymentResponse.class);
 
         if (refundResponse == null || !refundResponse.isSuccess()) {
