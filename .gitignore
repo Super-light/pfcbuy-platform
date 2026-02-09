@@ -16,3 +16,34 @@ dist/
 
 # OS
 .DS_Store
+
+# 日志文件
+*.log
+
+# PID 文件
+*.pid
+
+# 备份文件
+*.bak
+*.backup
+*.backup2
+*.backup[0-9]
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# Mac
+.DS_Store
+
+# Node
+node_modules/
+dist/
+.next/
