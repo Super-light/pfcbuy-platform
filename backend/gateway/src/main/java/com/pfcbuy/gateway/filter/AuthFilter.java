@@ -1,8 +1,9 @@
 package com.pfcbuy.gateway.filter;
 
 import com.pfcbuy.common.utils.JwtUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +12,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -22,9 +22,10 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@ConfigurationProperties(prefix = "auth")
+@Data
 public class AuthFilter extends AbstractGatewayFilterFactory<Object> {
 
-    @Value("${auth.skip-urls}")
     private List<String> skipUrls;
 
     @Override

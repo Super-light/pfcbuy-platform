@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: gateway
+  main:
+    web-application-type: reactive
 
   # 数据库配置
   datasource:
@@ -76,7 +78,7 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
+            allowed-origin-patterns: "*"
             allowed-methods: "*"
             allowed-headers: "*"
             allow-credentials: true
@@ -87,12 +89,13 @@ spring:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
   # Redis配置（用于限流）
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:}
-    database: 0
-    timeout: 5000ms
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      port: ${REDIS_PORT:6379}
+      timeout: 5000ms
 
 # MyBatis-Plus配置
 mybatis-plus:
