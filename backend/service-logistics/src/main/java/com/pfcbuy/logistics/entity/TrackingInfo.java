@@ -24,50 +24,40 @@ import java.time.LocalDateTime;
 public class TrackingInfo extends BaseEntity {
     
     /**
-     * 物流订单号
+     * 物流订单ID
      */
-    private String shippingOrderNo;
-    
+    private Long shippingId;
+
     /**
      * 物流单号
      */
-    private String trackingNo;
-    
+    private String shippingNo;
+
     /**
-     * 物流渠道
+     * 物流跟踪号
      */
-    private String channel;
-    
+    private String trackingNo;
+
     /**
-     * 追踪状态
+     * 状态
      */
     private String status;
     
     /**
-     * 追踪描述
+     * 描述
      */
     private String description;
     
     /**
-     * 位置信息
+     * 位置
      */
     private String location;
     
     /**
-     * 国家
+     * 发生时间
      */
-    private String country;
-    
-    /**
-     * 城市
-     */
-    private String city;
-    
-    /**
-     * 事件时间
-     */
-    private LocalDateTime eventTime;
-    
+    private LocalDateTime occurTime;
+
     /**
      * 操作人
      */

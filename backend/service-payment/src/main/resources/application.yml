@@ -73,11 +73,10 @@ feign:
         connectTimeout: 5000
         readTimeout: 10000
         loggerLevel: full
-
-# 服务地址配置
-service:
-  order:
+  order-service:
     url: ${ORDER_SERVICE_URL:http://localhost:8081}
+  user-service:
+    url: ${USER_SERVICE_URL:http://localhost:8084}
 
 # 日志配置
 logging:

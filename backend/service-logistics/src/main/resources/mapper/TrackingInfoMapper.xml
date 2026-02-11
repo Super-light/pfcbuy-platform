@@ -6,13 +6,16 @@
     <resultMap id="BaseResultMap" type="com.pfcbuy.logistics.entity.TrackingInfo">
         <id column="id" property="id"/>
         <result column="shipping_id" property="shippingId"/>
-        <result column="tracking_time" property="trackingTime"/>
+        <result column="shipping_no" property="shippingNo"/>
+        <result column="tracking_no" property="trackingNo"/>
         <result column="status" property="status"/>
-        <result column="location" property="location"/>
         <result column="description" property="description"/>
+        <result column="location" property="location"/>
+        <result column="occur_time" property="occurTime"/>
         <result column="operator" property="operator"/>
         <result column="remark" property="remark"/>
         <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
         <result column="is_deleted" property="isDeleted"/>
     </resultMap>
 

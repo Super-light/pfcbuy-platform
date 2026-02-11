@@ -67,7 +67,16 @@ public class LogisticsController {
         logisticsService.cancelShippingOrder(shippingOrderNo);
         return Result.success(null);
     }
-    
+
+    /**
+     * 更新物流状态
+     */
+    @PutMapping("/orders/{shippingOrderNo}/status/{status}")
+    public Result<String> updateShippingStatus(@PathVariable String shippingOrderNo, @PathVariable String status) {
+        logisticsService.updateShippingStatus(shippingOrderNo, status);
+        return Result.success("状态更新成功");
+    }
+
     /**
      * 运费试算
      */

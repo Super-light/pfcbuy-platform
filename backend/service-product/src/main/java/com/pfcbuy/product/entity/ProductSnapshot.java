@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "product_snapshot", autoResultMap = true)
+@TableName(value = "t_product_snapshot", autoResultMap = true)
 public class ProductSnapshot extends BaseEntity {
 
     /**
@@ -42,11 +43,6 @@ public class ProductSnapshot extends BaseEntity {
      * 商品标题
      */
     private String title;
-
-    /**
-     * 商品副标题/描述
-     */
-    private String subtitle;
 
     /**
      * SKU属性（JSON）
@@ -98,9 +94,9 @@ public class ProductSnapshot extends BaseEntity {
     private String detailHtml;
 
     /**
-     * 快照时间戳
+     * 快照时间
      */
-    private Long snapshotTime;
+    private LocalDateTime snapshotTime;
 
     /**
      * 是否可用（商品是否下架）

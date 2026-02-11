@@ -51,7 +51,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         
         // 1. 验证包裹号是否已存在物流订单
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getPackageNo, request.getPackageNo());
+        wrapper.eq(ShippingOrder::getPackageIds, request.getPackageNo());
         if (shippingOrderMapper.selectCount(wrapper) > 0) {
             throw new BusinessException("该包裹已存在物流订单");
         }
@@ -67,7 +67,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         
         // 4. 获取物流线路并计算运费
         ShippingRoute route = getShippingRoute(request.getChannel(), request.getReceiverCountry());
-        if (route == null || !route.getEnabled()) {
+        if (route == null || !"ENABLED".equals(route.getStatus())) {
             throw new BusinessException("该物流渠道暂不可用");
         }
         
@@ -83,21 +83,20 @@ public class LogisticsServiceImpl implements LogisticsService {
         
         // 6. 创建物流订单
         ShippingOrder shippingOrder = ShippingOrder.builder()
-                .shippingOrderNo(generateShippingOrderNo())
+                .shippingNo(generateShippingOrderNo())
                 .userId(request.getUserId())
-                .packageNo(request.getPackageNo())
-                .channel(request.getChannel())
+                .packageIds(request.getPackageNo())
+                .carrier(request.getChannel())
                 .trackingNo(generateTrackingNo(request.getChannel()))
                 .status("CREATED")
                 .receiverName(request.getReceiverName())
                 .receiverPhone(request.getReceiverPhone())
-                .receiverEmail(request.getReceiverEmail())
                 .receiverCountry(request.getReceiverCountry())
-                .receiverState(request.getReceiverState())
+                .receiverProvince(request.getReceiverState())
                 .receiverCity(request.getReceiverCity())
                 .receiverAddress(request.getReceiverAddress())
                 .receiverZipCode(request.getReceiverZipCode())
-                .actualWeight(request.getActualWeight())
+                .weight(request.getActualWeight())
                 .volumeWeight(volumeWeight)
                 .chargeableWeight(chargeableWeight)
                 .shippingFee(shippingFee)
@@ -105,7 +104,7 @@ public class LogisticsServiceImpl implements LogisticsService {
                 .insuranceFee(insuranceFee)
                 .customsFee(BigDecimal.ZERO)
                 .totalFee(shippingFee.add(insuranceFee))
-                .estimatedDeliveryTime(LocalDateTime.now().plusDays(route.getEstimatedDays()))
+                .estimatedDeliveryDays(route.getEstimatedDeliveryDays())
                 .remark(request.getRemark())
                 .build();
         
@@ -113,21 +112,21 @@ public class LogisticsServiceImpl implements LogisticsService {
         
         // 7. 创建初始追踪信息
         trackingService.addTrackingInfo(
-                shippingOrder.getShippingOrderNo(),
+                shippingOrder.getShippingNo(),
                 "CREATED",
                 "物流订单已创建",
                 "China"
         );
         
-        log.info("物流订单创建成功，订单号: {}", shippingOrder.getShippingOrderNo());
-        
+        log.info("物流订单创建成功，订单号: {}", shippingOrder.getShippingNo());
+
         return convertToResponse(shippingOrder);
     }
     
     @Override
     public ShippingOrderResponse getShippingOrder(String shippingOrderNo) {
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getShippingOrderNo, shippingOrderNo);
+        wrapper.eq(ShippingOrder::getShippingNo, shippingOrderNo);
         ShippingOrder shippingOrder = shippingOrderMapper.selectOne(wrapper);
         
         if (shippingOrder == null) {
@@ -140,7 +139,7 @@ public class LogisticsServiceImpl implements LogisticsService {
     @Override
     public ShippingOrderResponse getShippingOrderByPackageNo(String packageNo) {
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getPackageNo, packageNo);
+        wrapper.eq(ShippingOrder::getPackageIds, packageNo);
         ShippingOrder shippingOrder = shippingOrderMapper.selectOne(wrapper);
         
         if (shippingOrder == null) {
@@ -167,7 +166,7 @@ public class LogisticsServiceImpl implements LogisticsService {
     @Transactional(rollbackFor = Exception.class)
     public void updateShippingStatus(String shippingOrderNo, String status) {
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getShippingOrderNo, shippingOrderNo);
+        wrapper.eq(ShippingOrder::getShippingNo, shippingOrderNo);
         ShippingOrder shippingOrder = shippingOrderMapper.selectOne(wrapper);
         
         if (shippingOrder == null) {
@@ -176,7 +175,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         
         shippingOrder.setStatus(status);
         if ("DELIVERED".equals(status)) {
-            shippingOrder.setActualDeliveryTime(LocalDateTime.now());
+            shippingOrder.setDeliveredTime(LocalDateTime.now());
         }
         
         shippingOrderMapper.updateById(shippingOrder);
@@ -188,7 +187,7 @@ public class LogisticsServiceImpl implements LogisticsService {
     @Transactional(rollbackFor = Exception.class)
     public void cancelShippingOrder(String shippingOrderNo) {
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getShippingOrderNo, shippingOrderNo);
+        wrapper.eq(ShippingOrder::getShippingNo, shippingOrderNo);
         ShippingOrder shippingOrder = shippingOrderMapper.selectOne(wrapper);
         
         if (shippingOrder == null) {
@@ -224,13 +223,11 @@ public class LogisticsServiceImpl implements LogisticsService {
         // 3. 获取所有可用线路
         LambdaQueryWrapper<ShippingRoute> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ShippingRoute::getDestinationCountry, request.getDestinationCountry())
-                .eq(ShippingRoute::getEnabled, true)
-                .le(ShippingRoute::getMinWeight, chargeableWeight)
-                .ge(ShippingRoute::getMaxWeight, chargeableWeight)
+                .eq(ShippingRoute::getStatus, "ENABLED")
                 .orderByAsc(ShippingRoute::getSortOrder);
         
         if (request.getChannel() != null && !request.getChannel().isEmpty()) {
-            wrapper.eq(ShippingRoute::getChannel, request.getChannel());
+            wrapper.eq(ShippingRoute::getCarrier, request.getChannel());
         }
         
         List<ShippingRoute> routes = shippingRouteMapper.selectList(wrapper);
@@ -244,22 +241,22 @@ public class LogisticsServiceImpl implements LogisticsService {
                     BigDecimal insuranceFee = BigDecimal.ZERO;
                     if (Boolean.TRUE.equals(request.getNeedInsurance()) 
                             && request.getInsuranceAmount() != null
-                            && Boolean.TRUE.equals(route.getInsurable())) {
+                            && Boolean.TRUE.equals(route.getInsuranceAvailable())) {
                         insuranceFee = request.getInsuranceAmount()
                                 .multiply(route.getInsuranceRate())
                                 .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
                     }
                     
                     return ShippingFeeResponse.RouteOption.builder()
-                            .channel(route.getChannel())
+                            .channel(route.getCarrier())
                             .routeName(route.getRouteName())
                             .chargeableWeight(chargeableWeight)
                             .shippingFee(shippingFee)
                             .insuranceFee(insuranceFee)
                             .totalFee(shippingFee.add(insuranceFee))
                             .currency("USD")
-                            .estimatedDays(route.getEstimatedDays())
-                            .trackable(route.getTrackable())
+                            .estimatedDays(route.getEstimatedDeliveryDays())
+                            .trackable(route.getTrackingAvailable())
                             .remark(route.getRemark())
                             .build();
                 })
@@ -275,10 +272,10 @@ public class LogisticsServiceImpl implements LogisticsService {
      */
     private ShippingRoute getShippingRoute(String channel, String destinationCountry) {
         LambdaQueryWrapper<ShippingRoute> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingRoute::getChannel, channel)
+        wrapper.eq(ShippingRoute::getCarrier, channel)
                 .eq(ShippingRoute::getDestinationCountry, destinationCountry)
-                .eq(ShippingRoute::getEnabled, true);
-        
+                .eq(ShippingRoute::getStatus, "ENABLED");
+
         return shippingRouteMapper.selectOne(wrapper);
     }
     
@@ -288,16 +285,16 @@ public class LogisticsServiceImpl implements LogisticsService {
     private BigDecimal calculateFee(BigDecimal chargeableWeight, ShippingRoute route) {
         BigDecimal fee;
         
-        if (chargeableWeight.compareTo(route.getFirstWeight()) <= 0) {
+        if (chargeableWeight.compareTo(route.getBaseWeight()) <= 0) {
             // 首重以内
-            fee = route.getFirstWeightPrice();
+            fee = route.getBasePrice();
         } else {
             // 首重 + 续重
-            BigDecimal additionalWeight = chargeableWeight.subtract(route.getFirstWeight());
+            BigDecimal additionalWeight = chargeableWeight.subtract(route.getBaseWeight());
             BigDecimal additionalWeightUnits = additionalWeight
                     .divide(route.getAdditionalWeight(), 0, RoundingMode.UP);
-            BigDecimal additionalFee = additionalWeightUnits.multiply(route.getAdditionalWeightPrice());
-            fee = route.getFirstWeightPrice().add(additionalFee);
+            BigDecimal additionalFee = additionalWeightUnits.multiply(route.getAdditionalPrice());
+            fee = route.getBasePrice().add(additionalFee);
         }
         
         return fee.setScale(2, RoundingMode.HALF_UP);
@@ -322,8 +319,46 @@ public class LogisticsServiceImpl implements LogisticsService {
      */
     private ShippingOrderResponse convertToResponse(ShippingOrder shippingOrder) {
         ShippingOrderResponse response = new ShippingOrderResponse();
-        BeanUtils.copyProperties(shippingOrder, response);
-        
+
+        response.setId(shippingOrder.getId());
+        response.setShippingOrderNo(shippingOrder.getShippingNo());
+        response.setUserId(shippingOrder.getUserId());
+        response.setPackageNo(shippingOrder.getPackageIds());
+        response.setOrderNo(shippingOrder.getOrderNo());
+        response.setChannel(shippingOrder.getCarrier());
+        response.setTrackingNo(shippingOrder.getTrackingNo());
+        response.setStatus(shippingOrder.getStatus());
+        response.setReceiverName(shippingOrder.getReceiverName());
+        response.setReceiverPhone(shippingOrder.getReceiverPhone());
+        response.setReceiverEmail(null);
+        response.setReceiverCountry(shippingOrder.getReceiverCountry());
+        response.setReceiverState(shippingOrder.getReceiverProvince());
+        response.setReceiverCity(shippingOrder.getReceiverCity());
+        response.setReceiverAddress(shippingOrder.getReceiverAddress());
+        response.setReceiverZipCode(shippingOrder.getReceiverZipCode());
+        response.setActualWeight(shippingOrder.getWeight());
+        response.setVolumeWeight(shippingOrder.getVolumeWeight());
+        response.setChargeableWeight(shippingOrder.getChargeableWeight());
+        response.setShippingFee(shippingOrder.getShippingFee());
+        response.setCurrency(shippingOrder.getCurrency());
+        response.setInsuranceFee(shippingOrder.getInsuranceFee());
+        response.setCustomsFee(shippingOrder.getCustomsFee());
+        response.setTotalFee(shippingOrder.getTotalFee());
+
+        // 时间字段转换
+        if (shippingOrder.getEstimatedDeliveryDays() != null && shippingOrder.getCreateTime() != null) {
+            response.setEstimatedDeliveryTime(
+                shippingOrder.getCreateTime().plusDays(shippingOrder.getEstimatedDeliveryDays())
+            );
+        }
+        response.setActualDeliveryTime(shippingOrder.getDeliveredTime());
+        response.setPickupTime(shippingOrder.getShippedTime());
+
+        response.setExceptionReason(null);
+        response.setRemark(shippingOrder.getRemark());
+        response.setCreateTime(shippingOrder.getCreateTime());
+        response.setUpdateTime(shippingOrder.getUpdateTime());
+
         // 获取追踪信息
         List<TrackingInfoResponse> trackingInfos = trackingService.getTrackingInfo(shippingOrder.getTrackingNo());
         response.setTrackingInfos(trackingInfos);

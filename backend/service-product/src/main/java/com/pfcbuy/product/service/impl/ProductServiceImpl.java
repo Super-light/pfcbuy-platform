@@ -15,6 +15,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -109,7 +112,6 @@ public class ProductServiceImpl implements ProductService {
         snapshot.setPlatform(response.getPlatform());
         snapshot.setPlatformProductId(response.getPlatformProductId());
         snapshot.setTitle(response.getTitle());
-        snapshot.setSubtitle(response.getSubtitle());
         snapshot.setPrice(response.getPrice());
         snapshot.setOriginalPrice(response.getOriginalPrice());
         snapshot.setCurrency(response.getCurrency());
@@ -117,7 +119,10 @@ public class ProductServiceImpl implements ProductService {
         snapshot.setMainImage(response.getMainImage());
         snapshot.setImages(response.getImages());
         snapshot.setProductUrl(response.getProductUrl());
-        snapshot.setSnapshotTime(response.getSnapshotTime());
+        snapshot.setSnapshotTime(LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(response.getSnapshotTime()),
+            ZoneId.systemDefault()
+        ));
         snapshot.setAvailable(response.getAvailable());
 
         snapshotMapper.insert(snapshot);
@@ -136,6 +141,17 @@ public class ProductServiceImpl implements ProductService {
         ProductResolveResponse response = new ProductResolveResponse();
         BeanUtils.copyProperties(snapshot, response);
         response.setSnapshotId(snapshot.getId());
+
+        // 转换时间类型：LocalDateTime -> Long
+        if (snapshot.getSnapshotTime() != null) {
+            response.setSnapshotTime(
+                snapshot.getSnapshotTime()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            );
+        }
+
         return response;
     }
 

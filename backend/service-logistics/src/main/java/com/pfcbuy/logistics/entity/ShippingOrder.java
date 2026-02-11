@@ -25,40 +25,80 @@ import java.time.LocalDateTime;
 public class ShippingOrder extends BaseEntity {
     
     /**
-     * 物流订单号
+     * 物流单号
      */
-    private String shippingOrderNo;
-    
+    private String shippingNo;
+
     /**
      * 用户ID
      */
     private Long userId;
     
     /**
-     * 包裹号
+     * 关联订单ID
      */
-    private String packageNo;
-    
+    private Long orderId;
+
     /**
-     * 订单号
+     * 关联订单号
      */
     private String orderNo;
     
     /**
-     * 物流渠道（DHL/FEDEX/UPS/EMS）
+     * 包裹ID列表（JSON数组）
      */
-    private String channel;
-    
+    private String packageIds;
+
+    /**
+     * 物流类型(DOMESTIC/INTERNATIONAL)
+     */
+    private String shippingType;
+
+    /**
+     * 物流线路ID
+     */
+    private Long routeId;
+
+    /**
+     * 物流线路名称
+     */
+    private String routeName;
+
+    /**
+     * 承运商
+     */
+    private String carrier;
+
     /**
      * 物流单号
      */
     private String trackingNo;
     
     /**
-     * 状态（CREATED/PICKED_UP/IN_TRANSIT/OUT_FOR_DELIVERY/DELIVERED/EXCEPTION）
+     * 物流状态
      */
     private String status;
     
+    /**
+     * 发件人姓名
+     */
+    private String senderName;
+
+    /**
+     * 发件人电话
+     */
+    private String senderPhone;
+
+    /**
+     * 发件国家
+     */
+    private String senderCountry;
+
+    /**
+     * 发件地址
+     */
+    private String senderAddress;
+
     /**
      * 收件人姓名
      */
@@ -70,40 +110,40 @@ public class ShippingOrder extends BaseEntity {
     private String receiverPhone;
     
     /**
-     * 收件人邮箱
-     */
-    private String receiverEmail;
-    
-    /**
      * 收件国家
      */
     private String receiverCountry;
     
     /**
-     * 收件省/州
+     * 收件省份
      */
-    private String receiverState;
-    
+    private String receiverProvince;
+
     /**
      * 收件城市
      */
     private String receiverCity;
     
     /**
-     * 收件地址
+     * 收件区/县
+     */
+    private String receiverDistrict;
+
+    /**
+     * 收件详细地址
      */
     private String receiverAddress;
     
     /**
-     * 收件邮编
+     * 邮编
      */
     private String receiverZipCode;
     
     /**
-     * 实际重量（kg）
+     * 总重量（kg）
      */
-    private BigDecimal actualWeight;
-    
+    private BigDecimal weight;
+
     /**
      * 体积重（kg）
      */
@@ -120,15 +160,15 @@ public class ShippingOrder extends BaseEntity {
     private BigDecimal shippingFee;
     
     /**
-     * 运费币种
-     */
-    private String currency;
-    
-    /**
      * 保险费
      */
     private BigDecimal insuranceFee;
-    
+
+    /**
+     * 申报价值
+     */
+    private BigDecimal declaredValue;
+
     /**
      * 关税
      */
@@ -140,25 +180,25 @@ public class ShippingOrder extends BaseEntity {
     private BigDecimal totalFee;
     
     /**
-     * 预计送达时间
+     * 货币类型
      */
-    private LocalDateTime estimatedDeliveryTime;
-    
+    private String currency;
+
     /**
-     * 实际送达时间
+     * 预计送达天数
      */
-    private LocalDateTime actualDeliveryTime;
-    
+    private Integer estimatedDeliveryDays;
+
     /**
-     * 揽件时间
+     * 发货时间
      */
-    private LocalDateTime pickupTime;
-    
+    private LocalDateTime shippedTime;
+
     /**
-     * 异常原因
+     * 签收时间
      */
-    private String exceptionReason;
-    
+    private LocalDateTime deliveredTime;
+
     /**
      * 备注
      */

@@ -9,6 +9,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.1.5</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.pfcbuy</groupId>
@@ -18,25 +19,22 @@
 
     <properties>
         <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <stripe.version>24.6.0</stripe.version>
-        <lombok.version>1.18.30</lombok.version>
+        <stripe.version>25.5.0</stripe.version>
+        <lombok.version>1.18.34</lombok.version>
     </properties>
 
     <modules>
         <module>common</module>
+        <module>service-user</module>
+        <module>service-product</module>
         <module>service-order</module>
         <module>service-payment</module>
-        <module>service-product</module>
-        <module>service-search</module>
         <module>service-warehouse</module>
-        <module>service-user</module>
-        <module>gateway</module>
         <module>service-logistics</module>
+        <module>service-search</module>
+        <module>gateway</module>
     </modules>
 
     <dependencyManagement>
@@ -49,7 +47,35 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            
+            <!-- 强制指定 Spring Cloud Commons 版本 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-commons</artifactId>
+                <version>4.0.5</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

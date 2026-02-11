@@ -34,10 +34,20 @@ public class ShippingRoute extends BaseEntity {
     private String routeName;
     
     /**
-     * 物流渠道
+     * 英文名称
      */
-    private String channel;
-    
+    private String routeNameEn;
+
+    /**
+     * 承运商
+     */
+    private String carrier;
+
+    /**
+     * 物流类型(DOMESTIC/INTERNATIONAL)
+     */
+    private String shippingType;
+
     /**
      * 发货国家
      */
@@ -51,13 +61,13 @@ public class ShippingRoute extends BaseEntity {
     /**
      * 首重（kg）
      */
-    private BigDecimal firstWeight;
-    
+    private BigDecimal baseWeight;
+
     /**
      * 首重价格
      */
-    private BigDecimal firstWeightPrice;
-    
+    private BigDecimal basePrice;
+
     /**
      * 续重（kg）
      */
@@ -66,8 +76,8 @@ public class ShippingRoute extends BaseEntity {
     /**
      * 续重价格
      */
-    private BigDecimal additionalWeightPrice;
-    
+    private BigDecimal additionalPrice;
+
     /**
      * 最小重量（kg）
      */
@@ -79,30 +89,35 @@ public class ShippingRoute extends BaseEntity {
     private BigDecimal maxWeight;
     
     /**
+     * 货币类型
+     */
+    private String currency;
+
+    /**
      * 预计送达天数
      */
-    private Integer estimatedDays;
-    
+    private Integer estimatedDeliveryDays;
+
     /**
-     * 是否支持追踪
+     * 是否可跟踪(0:否,1:是)
      */
-    private Boolean trackable;
-    
+    private Boolean trackingAvailable;
+
     /**
-     * 是否支持保险
+     * 是否可保价(0:否,1:是)
      */
-    private Boolean insurable;
-    
+    private Boolean insuranceAvailable;
+
     /**
-     * 保险费率（%）
+     * 保价费率
      */
     private BigDecimal insuranceRate;
     
     /**
-     * 是否启用
+     * 状态(ACTIVE/INACTIVE)
      */
-    private Boolean enabled;
-    
+    private String status;
+
     /**
      * 排序
      */

@@ -7,18 +7,23 @@
         <id column="id" property="id"/>
         <result column="route_code" property="routeCode"/>
         <result column="route_name" property="routeName"/>
-        <result column="logistics_provider" property="logisticsProvider"/>
-        <result column="source_country" property="sourceCountry"/>
-        <result column="dest_country" property="destCountry"/>
+        <result column="route_name_en" property="routeNameEn"/>
+        <result column="carrier" property="carrier"/>
         <result column="shipping_type" property="shippingType"/>
+        <result column="origin_country" property="originCountry"/>
+        <result column="destination_country" property="destinationCountry"/>
         <result column="min_weight" property="minWeight"/>
         <result column="max_weight" property="maxWeight"/>
-        <result column="first_weight" property="firstWeight"/>
-        <result column="first_weight_price" property="firstWeightPrice"/>
-        <result column="additional_weight_price" property="additionalWeightPrice"/>
-        <result column="estimated_days" property="estimatedDays"/>
+        <result column="base_weight" property="baseWeight"/>
+        <result column="base_price" property="basePrice"/>
+        <result column="additional_weight" property="additionalWeight"/>
+        <result column="additional_price" property="additionalPrice"/>
         <result column="currency" property="currency"/>
-        <result column="is_active" property="isActive"/>
+        <result column="estimated_delivery_days" property="estimatedDeliveryDays"/>
+        <result column="tracking_available" property="trackingAvailable"/>
+        <result column="insurance_available" property="insuranceAvailable"/>
+        <result column="insurance_rate" property="insuranceRate"/>
+        <result column="status" property="status"/>
         <result column="sort_order" property="sortOrder"/>
         <result column="remark" property="remark"/>
         <result column="create_time" property="createTime"/>

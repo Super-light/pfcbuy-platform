@@ -7,34 +7,39 @@
         <id column="id" property="id"/>
         <result column="shipping_no" property="shippingNo"/>
         <result column="user_id" property="userId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_no" property="orderNo"/>
         <result column="package_ids" property="packageIds"/>
+        <result column="shipping_type" property="shippingType"/>
         <result column="route_id" property="routeId"/>
         <result column="route_name" property="routeName"/>
-        <result column="logistics_provider" property="logisticsProvider"/>
-        <result column="tracking_number" property="trackingNumber"/>
-        <result column="recipient_name" property="recipientName"/>
-        <result column="recipient_phone" property="recipientPhone"/>
-        <result column="recipient_email" property="recipientEmail"/>
-        <result column="recipient_country" property="recipientCountry"/>
-        <result column="recipient_province" property="recipientProvince"/>
-        <result column="recipient_city" property="recipientCity"/>
-        <result column="recipient_district" property="recipientDistrict"/>
-        <result column="recipient_address" property="recipientAddress"/>
-        <result column="recipient_postal_code" property="recipientPostalCode"/>
-        <result column="total_weight" property="totalWeight"/>
+        <result column="carrier" property="carrier"/>
+        <result column="tracking_no" property="trackingNo"/>
+        <result column="status" property="status"/>
+        <result column="sender_name" property="senderName"/>
+        <result column="sender_phone" property="senderPhone"/>
+        <result column="sender_country" property="senderCountry"/>
+        <result column="sender_address" property="senderAddress"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="receiver_phone" property="receiverPhone"/>
+        <result column="receiver_country" property="receiverCountry"/>
+        <result column="receiver_province" property="receiverProvince"/>
+        <result column="receiver_city" property="receiverCity"/>
+        <result column="receiver_district" property="receiverDistrict"/>
+        <result column="receiver_address" property="receiverAddress"/>
+        <result column="receiver_zip_code" property="receiverZipCode"/>
+        <result column="weight" property="weight"/>
         <result column="volume_weight" property="volumeWeight"/>
         <result column="chargeable_weight" property="chargeableWeight"/>
         <result column="shipping_fee" property="shippingFee"/>
         <result column="insurance_fee" property="insuranceFee"/>
+        <result column="declared_value" property="declaredValue"/>
         <result column="customs_fee" property="customsFee"/>
-        <result column="other_fee" property="otherFee"/>
         <result column="total_fee" property="totalFee"/>
         <result column="currency" property="currency"/>
-        <result column="status" property="status"/>
-        <result column="paid_time" property="paidTime"/>
+        <result column="estimated_delivery_days" property="estimatedDeliveryDays"/>
         <result column="shipped_time" property="shippedTime"/>
         <result column="delivered_time" property="deliveredTime"/>
-        <result column="estimated_delivery_date" property="estimatedDeliveryDate"/>
         <result column="remark" property="remark"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>

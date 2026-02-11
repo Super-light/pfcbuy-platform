@@ -35,8 +35,8 @@ public class TrackingServiceImpl implements TrackingService {
     public List<TrackingInfoResponse> getTrackingInfo(String trackingNo) {
         LambdaQueryWrapper<TrackingInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(TrackingInfo::getTrackingNo, trackingNo)
-                .orderByDesc(TrackingInfo::getEventTime);
-        
+                .orderByDesc(TrackingInfo::getOccurTime);
+
         List<TrackingInfo> trackingInfos = trackingInfoMapper.selectList(wrapper);
         
         return trackingInfos.stream()
@@ -49,7 +49,7 @@ public class TrackingServiceImpl implements TrackingService {
     public void syncTrackingInfo(String shippingOrderNo) {
         // 获取物流订单
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getShippingOrderNo, shippingOrderNo);
+        wrapper.eq(ShippingOrder::getShippingNo, shippingOrderNo);
         ShippingOrder shippingOrder = shippingOrderMapper.selectOne(wrapper);
         
         if (shippingOrder == null) {
@@ -59,8 +59,8 @@ public class TrackingServiceImpl implements TrackingService {
         // TODO: 根据不同的物流渠道调用对应的API获取追踪信息
         // 这里模拟从物流商API获取数据
         log.info("同步物流追踪信息，渠道: {}, 单号: {}", 
-                shippingOrder.getChannel(), shippingOrder.getTrackingNo());
-        
+                shippingOrder.getCarrier(), shippingOrder.getTrackingNo());
+
         // 实际项目中这里应该调用物流商API
         // 例如：DHLClient.getTrackingInfo(trackingNo)
         //      FedExClient.getTrackingInfo(trackingNo)
@@ -72,7 +72,7 @@ public class TrackingServiceImpl implements TrackingService {
                                  String description, String location) {
         // 获取物流订单
         LambdaQueryWrapper<ShippingOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShippingOrder::getShippingOrderNo, shippingOrderNo);
+        wrapper.eq(ShippingOrder::getShippingNo, shippingOrderNo);
         ShippingOrder shippingOrder = shippingOrderMapper.selectOne(wrapper);
         
         if (shippingOrder == null) {
@@ -81,13 +81,13 @@ public class TrackingServiceImpl implements TrackingService {
         
         // 创建追踪信息
         TrackingInfo trackingInfo = TrackingInfo.builder()
-                .shippingOrderNo(shippingOrderNo)
+                .shippingId(shippingOrder.getId())
+                .shippingNo(shippingOrderNo)
                 .trackingNo(shippingOrder.getTrackingNo())
-                .channel(shippingOrder.getChannel())
                 .status(status)
                 .description(description)
                 .location(location)
-                .eventTime(LocalDateTime.now())
+                .occurTime(LocalDateTime.now())
                 .build();
         
         trackingInfoMapper.insert(trackingInfo);
